@@ -32,24 +32,24 @@ class DeepLesionDataset(Dataset):
     def __len__(self):
         return len(self.samples)
 
-    def random_crop(self, image):
+    def random_crop(self, image, x_start=None, y_start=None):
         image = np.asarray(image)
         h, w = image.shape
         c_h, c_w = self.crop_size
 
-        x_start = np.random.randint(0, h - c_h)
-        y_start = np.random.randint(0, w - c_w)
+        x_start = np.random.randint(0, h - c_h) if x_start == None else x_start
+        y_start = np.random.randint(0, w - c_w) if y_start == None else y_start
 
         image = image[x_start:x_start + c_h, y_start:y_start + c_w]
-        return Image.fromarray(image)
+        return Image.fromarray(image), x_start, y_start
 
     def __getitem__(self, idx):
         imageHR = Image.open(self.at(idx)).convert('L')
         imageLR = Image.open(self.at(idx).replace('miniStudies', 'noiseStudies')).convert('L')
         if self.crop_size:
             crop_size = np.asarray(self.crop_size)
-            imageHR = self.random_crop(image)
-            imageLR = imageHR.resize(crop_size[::-1] // self.scale_factor, resample=Image.LANCZOS)
+            imageHR, x, y = self.random_crop(imageHR)
+            imageLR, _, _ = self.random_crop(imageLR, x, y)
 
         return (self.totensor(imageLR), self.totensor(imageHR))
 

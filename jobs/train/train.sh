@@ -27,7 +27,7 @@ then
 fi
 
 # Data is ready now run python file
-cd ~/Projects/freq-sr/
+cd ~/Projects/DnCNN-PyTorch/
 echo "Running python script now"
-mkdir ./logs/DL/
+# mkdir ./logs/DL/
 python -u train.py --data /data/pacole2/DeepLesionPreprocessed/miniStudies/ --batch 64 --outf logs/DL/

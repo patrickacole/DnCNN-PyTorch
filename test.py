@@ -6,7 +6,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from PIL import Image
 from models import DnCNN
+from torch.utils.data import DataLoader
+from dataset import DeepLesionDataset as Dataset
 from utils import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -31,7 +34,7 @@ def main():
     dataset_test = Dataset(root=opt.data, crop_size=None)
     loader_test = DataLoader(dataset=dataset_test, num_workers=4, batch_size=1, shuffle=False)
     # process data
-    psnr_test = 0
+    psnr_test = 0.
     for i, (img_lr, img_hr) in enumerate(loader_test, 0):
         # image
         img_lr = img_lr.cuda()
@@ -41,11 +44,17 @@ def main():
 
         psnr = batch_PSNR(learned_img, img_hr, 1.)
         psnr_test += psnr
-        print("%s PSNR %f" % (f, psnr))
+        # print("%s PSNR %f" % (f, psnr))
 
         # TODO: write code to save images
-
-    psnr_test /= len(files_source)
+        learned_img = Image.fromarray((255 * learned_img[0,0].cpu().data.numpy()).astype(np.uint8))
+        filename = os.path.join('./results', dataset_test.at(i).split(opt.data)[1])
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        learned_img.save(os.path.join(filename))
+    
+    psnr_test = psnr_test / len(dataset_test)
     print("\nPSNR on test data %f" % psnr_test)
 
 if __name__ == "__main__":

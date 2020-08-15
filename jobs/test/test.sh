@@ -27,7 +27,6 @@ then
 fi
 
 # Data is ready now run python file
-cd ~/Projects/freq-sr/
+cd ~/Projects/DnCNN-PyTorch/
 echo "Running python script now"
-mkdir ./logs/DL/
-python -u train.py --data /data/pacole2/DeepLesionTestPreprocessed/miniStudies/ --logdir logs/DL/
+python -u test.py --data /data/pacole2/DeepLesionTestPreprocessed/miniStudies/ --logdir logs/DL/

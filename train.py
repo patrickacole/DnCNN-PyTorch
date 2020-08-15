@@ -7,7 +7,7 @@ import torch.optim as optim
 import torchvision.utils as utils
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 from models import DnCNN
 from dataset import DeepLesionDataset as Dataset
 from utils import *
@@ -31,6 +31,7 @@ def main():
     dataset_train = Dataset(root=opt.data, crop_size=(64, 64))
     # dataset_val = Dataset(train=False)
     loader_train = DataLoader(dataset=dataset_train, num_workers=4, batch_size=opt.batch, shuffle=True)
+    print('Dataset length:', len(loader_train))
     print("# of training samples: %d\n" % int(len(dataset_train)))
     # Build model
     net = DnCNN(channels=1, num_of_layers=opt.num_of_layers)
@@ -43,7 +44,7 @@ def main():
     # Optimizer
     optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     # training
-    writer = SummaryWriter(opt.outf)
+    # writer = SummaryWriter(opt.outf)
     step = 0
     # noiseL_B=[0,55] # ingnored when opt.mode=='S'
     for epoch in range(opt.epochs):
@@ -74,10 +75,10 @@ def main():
             print("[epoch %d][%d/%d] loss: %.4f PSNR_train: %.4f" %
                 (epoch+1, i+1, len(loader_train), loss.item(), psnr_train))
             # if you are using older version of PyTorch, you may need to change loss.item() to loss.data[0]
-            if step % 10 == 0:
-                # Log the scalar values
-                writer.add_scalar('loss', loss.item(), step)
-                writer.add_scalar('PSNR on training data', psnr_train, step)
+            # if step % 10 == 0:
+            #     # Log the scalar values
+            #     writer.add_scalar('loss', loss.item(), step)
+            #     writer.add_scalar('PSNR on training data', psnr_train, step)
             step += 1
         ## the end of each epoch
         model.eval()

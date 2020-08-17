@@ -35,6 +35,7 @@ def main():
     loader_test = DataLoader(dataset=dataset_test, num_workers=4, batch_size=1, shuffle=False)
     # process data
     psnr_test = 0.
+    ssim_test = 0.
     for i, (img_lr, img_hr) in enumerate(loader_test, 0):
         # image
         img_lr = img_lr.cuda()
@@ -46,6 +47,9 @@ def main():
         psnr_test += psnr
         # print("%s PSNR %f" % (f, psnr))
 
+        ssim = batch_SSIM(learned_img, img_hr, 1.)
+        ssim_test += ssim
+
         # TODO: write code to save images
         learned_img = Image.fromarray((255 * learned_img[0,0].cpu().data.numpy()).astype(np.uint8))
         filename = os.path.join('./results', dataset_test.at(i).split(opt.data)[1])
@@ -53,9 +57,12 @@ def main():
         if not os.path.exists(directory):
             os.makedirs(directory)
         learned_img.save(os.path.join(filename))
-    
+
     psnr_test = psnr_test / len(dataset_test)
     print("\nPSNR on test data %f" % psnr_test)
+
+    ssim_test = ssim_test / len(dataset_test)
+    print("\nSSIM on test data %f" % ssim_test)
 
 if __name__ == "__main__":
     main()

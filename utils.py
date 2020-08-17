@@ -2,7 +2,8 @@ import math
 import torch
 import torch.nn as nn
 import numpy as np
-from skimage.measure.simple_metrics import compare_psnr
+from skimage.measure.metrics import peak_signal_noise_ratio as compare_psnr
+from skimage.measure.metrics import structural_similarity as compare_ssim
 
 def weights_init_kaiming(m):
     classname = m.__class__.__name__
@@ -22,6 +23,14 @@ def batch_PSNR(img, imclean, data_range):
     for i in range(Img.shape[0]):
         PSNR += compare_psnr(Iclean[i,:,:,:], Img[i,:,:,:], data_range=data_range)
     return (PSNR/Img.shape[0])
+
+def batch_SSIM(img, imclean, data_range):
+    Img = img.data.cpu().numpy().astype(np.float32)
+    Iclean = imclean.data.cpu().numpy().astype(np.float32)
+    SSIM = 0
+    for i in range(Img.shape[0]):
+        SSIM += compare_ssim(Iclean[i,:,:,:], Img[i,:,:,:], data_range=data_range)
+    return (SSIM/Img.shape[0])
 
 def data_augmentation(image, mode):
     out = np.transpose(image, (1,2,0))
